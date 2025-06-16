@@ -1,60 +1,101 @@
-# PowerShell Chat Room Project
+```powershell
+# Load necessary assembly for Windows Forms
+Add-Type -AssemblyName System.Windows.Forms
 
-## Project Overview
-This project aims to create a chat system allowing communication between multiple computers using PowerShell, with a Linode server as an intermediary.
+# Create the main form with dark background
+$form = New-Object System.Windows.Forms.Form
+$form.Text = 'Chat Room'
+$form.Size = New-Object System.Drawing.Size(500, 400)  # Adjusted form size to accommodate buttons
+$form.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
+$form.AutoScaleMode = 'Dpi'
 
-## Table of Contents
-- [Project Scope](#project-scope)
-- [Linode Server Setup](#linode-server-setup)
-- [Chat System Architecture](#chat-system-architecture)
-- [Server-side Application Development](#server-side-application-development)
-- [PowerShell Client Development](#powershell-client-development)
-- [Implementing Communication](#implementing-communication)
-- [Testing](#testing)
-- [Security and Reliability](#security-and-reliability)
-- [Documentation and Cleanup](#documentation-and-cleanup)
-- [Future Enhancements](#future-enhancements)
+# Create a RichTextBox for displaying messages with dark theme
+$richTextBoxDisplay = New-Object System.Windows.Forms.RichTextBox
+$richTextBoxDisplay.Location = New-Object System.Drawing.Point(10, 10)
+$richTextBoxDisplay.Size = New-Object System.Drawing.Size(360, 280)
+$richTextBoxDisplay.Anchor = 'Top,Left,Right,Bottom'
+$richTextBoxDisplay.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
+$richTextBoxDisplay.ForeColor = [System.Drawing.Color]::WhiteSmoke
+$form.Controls.Add($richTextBoxDisplay)
 
-## Project Scope
-- **Objective:** Create a chat system with PowerShell clients and a Linode server.
-- **Technologies:** PowerShell, Linux server, optional database, and web server technology.
-- **Security:** Implement SSL/TLS for secure communication.
+# Create a textbox for typing messages with dark theme
+$textBoxInput = New-Object System.Windows.Forms.TextBox
+$textBoxInput.Location = New-Object System.Drawing.Point(10, 300)
+$textBoxInput.Size = New-Object System.Drawing.Size(260, 20)
+$textBoxInput.Anchor = 'Bottom,Left,Right'
+$textBoxInput.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
+$textBoxInput.ForeColor = [System.Drawing.Color]::WhiteSmoke
+$form.Controls.Add($textBoxInput)
 
-## Linode Server Setup
-1. **Select a Linode Plan:** Choose a plan that fits the project needs.
-2. **Install Linux:** Set up a Linux distribution like Ubuntu.
-3. **Security Measures:** Configure firewalls and SSH keys.
-4. **Install Software:** Install necessary software like Apache, Node.js, or Python.
+# Create a button for sending messages with dark theme
+$buttonSend = New-Object System.Windows.Forms.Button
+$buttonSend.Location = New-Object System.Drawing.Point(280, 300)
+$buttonSend.Size = New-Object System.Drawing.Size(90, 20)
+$buttonSend.Anchor = 'Bottom,Right'
+$buttonSend.Text = 'Send'
+$buttonSend.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 70)
+$buttonSend.ForeColor = [System.Drawing.Color]::WhiteSmoke
+$form.Controls.Add($buttonSend)
 
-## Chat System Architecture
-- **Model:** Use a client-server model for message handling.
-- **Protocol:** Choose a communication protocol (e.g., HTTP, WebSocket).
+# Add an event handler for the Send button
+$buttonSend.Add_Click({
+    $richTextBoxDisplay.AppendText("You: $($textBoxInput.Text)`r`n")
+    $textBoxInput.Clear()
+    $richTextBoxDisplay.ScrollToCaret()
+})
 
-## Server-side Application Development
-1. **Backend Logic:** Write a script to handle and broadcast messages.
-2. **Database Setup (Optional):** Configure a database to store chat records.
+# Create a StatusStrip for the bottom of the form
+$statusStrip = New-Object System.Windows.Forms.StatusStrip
+$statusStrip.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 70)
+$statusLabel1 = New-Object System.Windows.Forms.ToolStripStatusLabel
+$statusLabel1.Text = "Status: "
+$statusLabel1.ForeColor = [System.Drawing.Color]::White
+$statusLabel2 = New-Object System.Windows.Forms.ToolStripStatusLabel
+$statusLabel2.Text = "Connected ✅"
+$statusLabel2.ForeColor = [System.Drawing.Color]::GreenYellow
+$statusStrip.Items.Add($statusLabel1)
+$statusStrip.Items.Add($statusLabel2)
+$form.Controls.Add($statusStrip)
 
-## PowerShell Client Development
-1. **Scripting:** Develop scripts for sending and receiving messages.
-2. **Interface:** Create a text-based interface in PowerShell.
+# Define button properties
+$buttonWidth = 80
+$buttonHeight = 20
+$initialButtonTop = 10
+$buttonSpacing = 40
 
-## Implementing Communication
-- **Sending Messages:** Code the functionality to send messages to the server.
-- **Receiving Messages:** Implement a method to receive new messages, like polling.
+# Function to create a button
+function Create-Button {
+    param ($text, $top)
+    $button = New-Object System.Windows.Forms.Button
+    $button.Location = New-Object System.Drawing.Point(400, $top)
+    $button.Size = New-Object System.Drawing.Size($buttonWidth, $buttonHeight)
+    $button.Anchor = 'Top,Right'  # Anchor set to Top and Right
+    $button.Text = $text
+    $button.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 70)
+    $button.ForeColor = [System.Drawing.Color]::WhiteSmoke
+    return $button
+}
 
-## Testing
-1. **Local Network Testing:** Begin testing on a local network.
-2. **Linode Server Testing:** Progress to testing with the Linode server.
+# Create and add buttons
+$buttonSearch = Create-Button -text 'Search' -top $initialButtonTop
+$form.Controls.Add($buttonSearch)
 
-## Security and Reliability
-- **Secure Data Transmission:** Implement SSL/TLS.
-- **Error Handling:** Add comprehensive error handling and logging.
+$buttonSendFile = Create-Button -text 'Send File' -top ($initialButtonTop + $buttonSpacing)
+$form.Controls.Add($buttonSendFile)
 
-## Documentation and Cleanup
-- **User Guide:** Write documentation on how to use the chat system.
-- **Code Refinement:** Refine and comment the code for better clarity.
+$buttonClearChat = Create-Button -text 'Clear Chat' -top ($initialButtonTop + 2 * $buttonSpacing)
+$form.Controls.Add($buttonClearChat)
 
-## Future Enhancements
-- **Additional Features:** Consider private messaging, user authentication, or multiple chat rooms.
-- **Performance Optimization:** Focus on server performance and scalability.
+$buttonSettings = Create-Button -text 'Settings' -top ($initialButtonTop + 3 * $buttonSpacing)
+$form.Controls.Add($buttonSettings)
+
+# Event handlers for buttons (placeholders for actual functionality)
+#$buttonSearch.Add_Click({ # Add search functionality here })
+#$buttonSendFile.Add_Click({ # Add file sending functionality here })
+#$buttonClearChat.Add_Click({ $richTextBoxDisplay.Clear() })
+#$buttonSettings.Add_Click({ # Add settings functionality here })
+
+# Show the form
+$form.ShowDialog()
+```
 
